@@ -52,8 +52,9 @@ when "ubuntu"
 
       php -v
     EOH
-  not_if do
-    ::File.exists?("/usr/bin/php")
+    not_if do
+      ::File.exists?("/usr/bin/php")
+    end
   end
 
   template File.join("", "etc", "php5", "apache2", "conf.d", "cf.ini") do
@@ -62,7 +63,7 @@ when "ubuntu"
     group "root"
     mode "0600"
   end
-
+  
 when "centos"
     %w[
     pcre
@@ -107,8 +108,9 @@ when "centos"
 
       php -v
     EOH
-  not_if do
-    ::File.exists?("/usr/bin/php")
+    not_if do
+      ::File.exists?("/usr/bin/php")
+    end
   end
 
   template File.join("", "etc", "php.d", "cf.ini") do
