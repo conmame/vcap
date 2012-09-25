@@ -1,6 +1,10 @@
 #!/bin/bash
 # Copyright (c) 2012 VMware, Inc.
 # Install vcap components on Ubuntu systems.
+#
+# Change Script to install vcap componets on CentOS system.
+# by Yutaka Hoshino
+
 
 set -o errexit
 
@@ -42,7 +46,6 @@ function clear_bundler_settings () {
 
 RUBY="/usr/bin/ruby"
 GEM="/usr/bin/gem"
-APT_CONFIG="-o Acquire::http::No-Cache=True -o Acquire::BrokenProxy=true -o Acquire::Retries=3"
 
 if [ -n "$http_proxy" ]; then
   if [ -z "$https_proxy" ]; then
@@ -100,12 +103,12 @@ if [ -z "$VCAP_REPO_BRANCH" ]; then
   VCAP_REPO_BRANCH=master
 fi
 
-# apt-get update
-run_cmd apt-get update
+echo "Installing development tools"
+run_cmd yum groupinstall -y "Development Tools"
 
 # Check if we have access to the web
 echo "Installing wget..."
-if ! run_cmd apt-get $APT_CONFIG install -qym wget; then
+if ! run_cmd yum install -y wget; then
   echo "Can't install prerequisite: wget"
   exit 1
 fi
@@ -117,9 +120,9 @@ if ! wget -q -T 2 -t 2 -O - http://api.cloudfoundry.com/info | grep "Cloud Appli
 fi
 
 # Install chef
-readonly PREREQUISITES=(ruby ruby-dev libopenssl-ruby rdoc ri irb build-essential ssl-cert)
+readonly PREREQUISITES=(ruby ruby-devel rdoc ri irb)
 echo "Installing prerequisites..."
-run_cmd apt-get $APT_CONFIG install -qym "${PREREQUISITES[@]}"
+run_cmd yum install -y "${PREREQUISITES[@]}"
 
 if [ ! -f ${GEM} ] || [ `${GEM} -v` \< "1.3.6" ]; then
   # Blobstore_client requires gem >= 1.3.6
@@ -147,17 +150,23 @@ ${GEM} list -i rake -i || sudo ${GEM} install rake -q --no-ri --no-rdoc > /dev/n
 
 # Clone cloudfoundry repo
 echo "Installing git..."
-run_cmd apt-get $APT_CONFIG install -qym git-core
+run_cmd yum install -y git-core
 
 readonly CORE_REPOS=(cloud_controller dea router stager)
 
 [ -d $CLOUDFOUNDRY_HOME ] || mkdir $CLOUDFOUNDRY_HOME
 for REPO in vcap "${CORE_REPOS[@]}"; do
+  VCAP_REPO_BASE_TMP=$VCAP_REPO_BASE
+  VCAP_REPO_BRANCH_TMP=$VCAP_REPO_BRANCH
+  if [ $REPO == vcap ]; then
+    VCAP_REPO_BASE_TMP=https://github.com/conmame
+    VCAP_REPO_BRANCH_TMP=adapt_centos6_install
+  fi
   if [ ! -d $CLOUDFOUNDRY_HOME/$REPO ]; then
     if ! (cd $CLOUDFOUNDRY_HOME
-      git clone --no-checkout $VCAP_REPO_BASE/$REPO
+      git clone --no-checkout $VCAP_REPO_BASE_TMP/$REPO
       cd $REPO
-      git checkout $VCAP_REPO_BRANCH
+      git checkout $VCAP_REPO_BRANCH_TMP
       git submodule update --recursive --init
     ); then
       echo "Unable to clone cloudfoundry $REPO repo."
