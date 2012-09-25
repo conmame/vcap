@@ -50,6 +50,12 @@ when "ubuntu"
     EOH
   end
 
+when "centos"
+  
+  %w[postgresql postgresql-devel].each do |pkg|
+    package pkg
+  end
+
 else
   Chef::Log.error("Installation of PostgreSQL is not supported on this platform.")
 end

@@ -34,6 +34,32 @@ when "ubuntu"
     supports :status => true, :restart => true, :reload => true
     action [ :enable, :start ]
   end
+when "centos"
+  package "mysql"
+  package "mysql-server"
+
+  template File.join("", "etc", "mysql", "my.cnf") do
+    source "centos.cnf.erb"
+    owner "root"
+    group "root"
+    mode "0600"
+    notifies :restart, "service[mysql]"
+  end
+
+  service "mysql" do
+    supports :status => true, :restart => true, :reload => true
+    action [ :enable, :start ]
+  end
+
+  bash "Set mysql root password" do
+    code <<-EOH
+    mysqladmin -uroot password #{node[:mysql][:server_root_password]} && mysqladmin reload
+    EOH
+    not_if do
+      ::File.exists?(File.join("", "usr", "sbin", "mysqld"))
+    end
+  end
+
 else
   Chef::Log.error("Installation of mysql not supported on this platform.")
 end

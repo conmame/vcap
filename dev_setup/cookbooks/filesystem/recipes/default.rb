@@ -7,7 +7,7 @@
 #
 
 case node['platform']
-when "ubuntu"
+when "ubuntu","centos"
 
   node[:filesystem_gateway][:backends].each do |path|
     bash "create backends" do

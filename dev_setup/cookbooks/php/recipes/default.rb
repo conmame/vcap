@@ -29,7 +29,6 @@ when "ubuntu"
     zend-framework
   ].each {|pkg| package pkg }
 
-
   bash "Setup php" do
     code <<-EOH
       /etc/init.d/apache2 stop
@@ -53,12 +52,9 @@ when "ubuntu"
 
       php -v
     EOH
-    not_if do
-      ::File.exists?("/usr/bin/php")
-    end
-
+  not_if do
+    ::File.exists?("/usr/bin/php")
   end
-
 
   template File.join("", "etc", "php5", "apache2", "conf.d", "cf.ini") do
     source "apache2.cnf.erb"
@@ -67,4 +63,58 @@ when "ubuntu"
     mode "0600"
   end
 
+when "centos"
+    %w[
+    pcre
+    pcre-dev
+    httpd
+    apr
+    apr-util
+    php
+    php-devel
+    php-mysql
+    php-pgsql
+    php-gd
+    php-common
+    php-curl
+    php-mcrypt
+    php-pecl-imagick
+    php-xmlrpc
+    php-imap
+    php-pear
+    php-ZendFramework
+  ].each {|pkg| package pkg }
+
+  bash "Setup php" do
+    code <<-EOH
+      /etc/init.d/httpd stop
+
+      cd /tmp/
+      pear channel-discover pear.phpunit.de
+      pear channel-discover pear.symfony-project.com
+      pear channel-discover components.ez.no
+      pear install phpunit/PHPUnit
+
+      yes | pecl install apc
+      yes | pecl install memcache
+      yes | pecl install mongo
+
+      git clone git://github.com/owlient/phpredis.git
+      cd phpredis
+      phpize && ./configure && make && sudo make install
+      cd ..
+      rm -rf phpredis
+
+      php -v
+    EOH
+  not_if do
+    ::File.exists?("/usr/bin/php")
+  end
+
+  template File.join("", "etc", "php.d", "cf.ini") do
+    source "apache2.cnf.erb"
+    owner "root"
+    group "root"
+    mode "0600"
+  end
 end

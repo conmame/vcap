@@ -7,8 +7,8 @@
 #
 
 case node['platform']
-when "ubuntu"
-#  package 'default-jdk'
+when "ubuntu","centos"
+package 'java7'
 # FIXME: add other major distro support
 
   java7_version = node[:java7][:version]

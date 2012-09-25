@@ -6,7 +6,7 @@
 #
 #
 case node['platform']
-when "ubuntu"
+when "ubuntu","centos"
   echoserver_tarball_path = File.join(node[:deployment][:setup_cache], "echoserver.zip")
   cf_remote_file echoserver_tarball_path do
     owner node[:deployment][:user]

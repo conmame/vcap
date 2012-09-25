@@ -23,20 +23,40 @@ end
 
 case node['platform']
 when "ubuntu"
-  template "nats_server" do
-    path File.join("", "etc", "init.d", "nats_server")
-    source "nats_server.erb"
-    owner node[:deployment][:user]
-    mode 0755
-    notifies :restart, "service[nats_server]"
+
+when "centos"
+
+  bash "Install start-stop-daemon" do
+    code <<-EOH
+      cd /usr/local/src
+      wget http://developer.axis.com/download/distribution/apps-sys-utils-start-stop-daemon-IR1_9_18-2.tar.gz
+      tar xvzf apps-sys-utils-start-stop-daemon-IR1_9_18-2.tar.gz
+      cd apps/sys-utils/start-stop-daemon-IR1_9_18-2/
+      gcc start-stop-daemon.c -o start-stop-daemon
+      cp start-stop-daemon /usr/sbin/
+      hash -r
+    EOH
+    not_if do
+      ::File.exists?(File.join("", "usr", "sbin", "start-stop-daemon"))
+    end
   end
 
-  service "nats_server" do
-    supports :status => true, :restart => true, :reload => true
-    action [ :enable, :start ]
-  end
 else
   Chef::Log.error("Installation of nats_server not supported on this platform.")
+end
+
+
+template "nats_server" do
+  path File.join("", "etc", "init.d", "nats_server")
+  source "nats_server.erb"
+  owner node[:deployment][:user]
+  mode 0755
+  notifies :restart, "service[nats_server]"
+end
+
+service "nats_server" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
 end
 
 template "nats_server.yml" do

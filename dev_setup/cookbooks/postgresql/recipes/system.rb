@@ -15,6 +15,10 @@ when "ubuntu"
   pg_port = "#{node[:postgresql][:system_port]}"
   cf_pg_install(pg_major_version, pg_port)
 
+when "centos"
+	
+	cf_pg_install(pg_major_version, pg_port)
+
 else
   Chef::Log.error("Installation of PostgreSQL is not supported on this platform.")
 end
