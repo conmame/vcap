@@ -6,7 +6,14 @@ module CloudFoundryPostgres
     return if process_pid == ""
     # no process listening on the port
     name, pid = process_pid.split
-    Chef::Log.error("The port is not occupied by postgresql database, but #{name} pid #{pid}") && (exit 1) unless name == "postgres"
+
+    case node['platform']
+    when "ubuntu"
+      Chef::Log.error("The port is not occupied by postgresql database, but #{name} pid #{pid}") && (exit 1) unless name == "postgres"
+    when "centos"
+      Chef::Log.error("The port is not occupied by postgresql database, but #{name} pid #{pid}") && (exit 1) unless name == "postmaste"
+    end
+
     binary = `ps -fp #{pid} | awk '{print $8}' | tail -n1`.strip
     return if binary == ""
     version_check = `#{binary} --version | grep postgres | grep #{pg_major_version}`.strip
