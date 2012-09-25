@@ -84,7 +84,7 @@ module CloudFoundryPostgres
       end
 
     when "centos"
-       %w[postgeresql postgresql-server].each do |pkg|
+       %w[postgresql postgresql-server].each do |pkg|
          package pkg
        end
 
