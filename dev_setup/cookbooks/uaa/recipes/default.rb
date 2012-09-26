@@ -6,6 +6,10 @@
 #
 #
 
+case node['platform']
+when "centos"
+  include_recipe "java"
+end
 
 cf_pg_reset_user_password(:uaadb)
 cf_pg_reset_user_password(:ccdb)

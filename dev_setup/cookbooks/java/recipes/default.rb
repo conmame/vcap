@@ -11,10 +11,13 @@ when "ubuntu"
 	package "python-software-properties"
 end
 
+package 'java'
+
 case node['platform']
-when "ubuntu","centos"
-  package 'java'
-# FIXME: add other major distro support
+when "ubuntu"
+	
+when "centos"
+	package "java-1.5.0-gcj"
 else
   Chef::Log.error("Installation of Sun Java packages not supported on this platform.")
 end
