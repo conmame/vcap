@@ -38,7 +38,7 @@ when "centos"
   package "mysql"
   package "mysql-server"
 
-  template File.join("", "etc", "mysql", "my.cnf") do
+  template File.join("", "etc", "my.cnf") do
     source "centos.cnf.erb"
     owner "root"
     group "root"
