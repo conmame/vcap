@@ -43,10 +43,10 @@ when "centos"
     owner "root"
     group "root"
     mode "0600"
-    notifies :restart, "service[mysql]"
+    notifies :restart, "service[mysqld]"
   end
 
-  service "mysql" do
+  service "mysqld" do
     supports :status => true, :restart => true, :reload => true
     action [ :enable, :start ]
   end
