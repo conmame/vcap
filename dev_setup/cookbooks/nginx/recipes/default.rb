@@ -188,25 +188,11 @@ template "nginx_router.conf" do
   mode 0644
 end
 
-template "nginx_router" do
-  path File.join("", "etc", "init.d", "nginx_router")
-  source "router-nginx.erb"
-  owner node[:deployment][:user]
-  mode 0755
-end
-
 template "nginx_cc.conf" do
   path File.join(nginx_path, "conf", "nginx_cc.conf")
   source "cc-nginx.conf.erb"
   owner node[:deployment][:user]
   mode 0644
-end
-
-template "nginx_cc" do
-  path File.join("", "etc", "init.d", "nginx_cc")
-  source "cc-nginx.erb"
-  owner node[:deployment][:user]
-  mode 0755
 end
 
 template "nginx_sds.conf" do
@@ -216,19 +202,60 @@ template "nginx_sds.conf" do
   mode 0644
 end
 
-template "nginx_sds" do
-  path File.join("", "etc", "init.d", "nginx_sds")
-  source "sds-nginx.erb"
-  owner node[:deployment][:user]
-  mode 0755
-end
-
 bash "Stop running nginx" do
   code <<-EOH
     pid=`ps -ef | grep nginx | grep -v grep | awk '{print $2}'`
     [ ! -z "$pid" ] && sudo kill $pid || true
   EOH
 end
+
+
+case node['platform']
+when "ubuntu"
+  template "nginx_cc" do
+    path File.join("", "etc", "init.d", "nginx_cc")
+    source "cc-nginx.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
+
+  template "nginx_sds" do
+    path File.join("", "etc", "init.d", "nginx_sds")
+    source "sds-nginx.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
+
+  template "nginx_router" do
+    path File.join("", "etc", "init.d", "nginx_router")
+    source "router-nginx.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
+
+when "centos"
+  template "nginx_cc_centos" do
+    path File.join("", "etc", "init.d", "nginx_cc")
+    source "cc-nginx_centos.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
+
+  template "nginx_sds_centos" do
+    path File.join("", "etc", "init.d", "nginx_sds")
+    source "sds-nginx_centos.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
+
+  template "nginx_router_centos" do
+    path File.join("", "etc", "init.d", "nginx_router")
+    source "router-nginx_centos.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
+end
+  
 
 service "nginx_router" do
   supports :status => true, :restart => true, :reload => true

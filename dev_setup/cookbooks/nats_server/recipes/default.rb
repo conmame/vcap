@@ -46,6 +46,7 @@ when "centos"
     not_if do
       ::File.exists?(File.join("", "usr", "sbin", "start-stop-daemon"))
     end
+  end
 
     template "nats_server_centos" do
       path File.join("", "etc", "init.d", "nats_server")
@@ -54,7 +55,6 @@ when "centos"
       mode 0755
       notifies :restart, "service[nats_server]"
     end
-  end
 
 else
   Chef::Log.error("Installation of nats_server not supported on this platform.")
