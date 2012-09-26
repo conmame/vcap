@@ -1,7 +1,10 @@
 module NodeInstall
   def cf_node_install(node_version, node_source_id, node_path, node_npm=nil)
-    %w[ build-essential ].each do |pkg|
-      package pkg
+    case node['platform']
+    when "ubuntu"
+      %w[ build-essential ].each do |pkg|
+        package pkg
+      end
     end
 
     tarball_path = File.join(node[:deployment][:setup_cache], "node-v#{node_version}.tar.gz")
