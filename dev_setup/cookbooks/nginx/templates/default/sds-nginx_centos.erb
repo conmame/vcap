@@ -28,11 +28,9 @@ case "$1" in
       chown -R <%= node[:deployment][:user]%>:root $UPLOADS_DIR
     fi
     start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid --exec $PROG -- $ARGS
-    return $?
     ;;
   stop)
     start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid --exec $PROG || true
-    return $?
     ;;
   restart)
     $0 stop; sleep 1; $0 start
