@@ -16,8 +16,12 @@ module CloudFoundryPostgres
 
     binary = `ps -fp #{pid} | awk '{print $8}' | tail -n1`.strip
     return if binary == ""
-    version_check = `#{binary} --version | grep postgres | grep #{pg_major_version}`.strip
-    Chef::Log.error("The running postgresql listening on port #{pg_port} could not match the version: #{pg_major_version}, try another port") && (exit 1) if version_check == ""
+    
+    case node['platform']
+    when "ubuntu"
+      version_check = `#{binary} --version | grep postgres | grep #{pg_major_version}`.strip
+      Chef::Log.error("The running postgresql listening on port #{pg_port} could not match the version: #{pg_major_version}, try another port") && (exit 1) if version_check == ""
+    end
   end
 
   def cf_pg_install(pg_major_version, pg_port)
