@@ -24,12 +24,12 @@ end
 case node['platform']
 when "ubuntu"
   template "nats_server" do
-  path File.join("", "etc", "init.d", "nats_server")
-  source "nats_server.erb"
-  owner node[:deployment][:user]
-  mode 0755
-  notifies :restart, "service[nats_server]"
-end
+    path File.join("", "etc", "init.d", "nats_server")
+    source "nats_server.erb"
+    owner node[:deployment][:user]
+    mode 0755
+    notifies :restart, "service[nats_server]"
+  end
 
 when "centos"
 
@@ -47,7 +47,7 @@ when "centos"
       ::File.exists?(File.join("", "usr", "sbin", "start-stop-daemon"))
     end
 
-    template "nats_server" do
+    template "nats_server_centos" do
       path File.join("", "etc", "init.d", "nats_server")
       source "nats_server_centos.erb"
       owner node[:deployment][:user]
