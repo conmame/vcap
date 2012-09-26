@@ -21,11 +21,21 @@ template "vcap_redis.conf" do
   mode 0644
 end
 
-template "vcap_redis" do
-  path File.join("", "etc", "init.d", "vcap_redis")
-  source "vcap_redis.erb"
-  owner node[:deployment][:user]
-  mode 0755
+case node['platform']
+when "ubuntu"
+  template "vcap_redis" do
+    path File.join("", "etc", "init.d", "vcap_redis")
+    source "vcap_redis.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
+when "centos"
+  template "vcap_redis_centos" do
+    path File.join("", "etc", "init.d", "vcap_redis")
+    source "vcap_redis_centos.erb"
+    owner node[:deployment][:user]
+    mode 0755
+  end
 end
 
 service "vcap_redis" do
