@@ -5,7 +5,11 @@
 # Copyright 2011, VMware
 #
 #
-package "python-software-properties"
+
+case node['platform']
+when "ubuntu"
+	package "python-software-properties"
+end
 
 case node['platform']
 when "ubuntu","centos"
