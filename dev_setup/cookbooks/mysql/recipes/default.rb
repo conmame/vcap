@@ -53,7 +53,8 @@ when "centos"
 
   bash "Set mysql root password" do
     code <<-EOH
-    mysqladmin -uroot password #{node[:mysql][:server_root_password]} && mysqladmin reload
+    /etc/init.d/mysql restart
+    mysqladmin -uroot -p#{node[:mysql][:server_root_password]} password #{node[:mysql][:server_root_password]} && mysqladmin reload
     EOH
     not_if do
       ::File.exists?(File.join("", "usr", "sbin", "mysqld"))
