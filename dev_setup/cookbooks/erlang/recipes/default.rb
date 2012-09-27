@@ -4,9 +4,17 @@
 # Copyright 2012, VMware
 #
 
-%w[ build-essential libncurses5-dev openssl libssl-dev ].each do |pkg|
-  package pkg
+case node['platform']
+when "ubuntu"
+  %w[ build-essential libncurses5-dev openssl libssl-dev ].each do |pkg|
+    package pkg
+  end
+when "centos"
+  %w[ ncurses-devel openssl openssl-devel ].each do |pkg|
+    package pkg
+  end
 end
+
 
 tarball_path = File.join(node[:deployment][:setup_cache], "otp_src_#{node[:erlang][:version]}.tar.gz")
 cf_remote_file tarball_path do
