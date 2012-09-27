@@ -6,9 +6,17 @@
 #
 #
 
-%w[ python-dev python-setuptools ].each do |pkg|
-  package pkg
+case node['platform']
+when "ubuntu"
+	%w[ python-dev python-setuptools ].each do |pkg|
+	  package pkg
+	end
+when "centos"
+	%w[ python python-devel python-setuptools ].each do |pkg|
+	  package pkg
+	end
 end
+
 
 bash "Installing pip" do
   code "sudo easy_install pip"
