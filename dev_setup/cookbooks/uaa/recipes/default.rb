@@ -8,7 +8,7 @@
 
 case node['platform']
 when "centos"
-  include_recipe "java"
+  package "java-1.5.0-gcj"
 end
 
 cf_pg_reset_user_password(:uaadb)
