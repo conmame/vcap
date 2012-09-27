@@ -22,6 +22,12 @@ module NodeInstall
       action :create
     end
 
+    build_option = ""
+    case node['platform']
+    when "centos"
+      build_option = "CFLAGS+=-O2 CXXFLAGS+=-O2" if node_version = "0.8.2"
+    end
+
     bash "Install Node.js version " + node_version do
       cwd File.join("", "tmp")
       user node[:deployment][:user]
@@ -29,8 +35,8 @@ module NodeInstall
       tar xzf #{tarball_path}
       cd node-v#{node_version}
       ./configure --prefix=#{node_path}
-      make
-      make install
+      make #{build_option}
+      make install #{build_option}
       EOH
     end
 
