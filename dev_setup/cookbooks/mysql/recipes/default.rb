@@ -53,7 +53,7 @@ when "centos"
 
   bash "Set mysql root password" do
     code <<-EOH
-    /etc/init.d/mysql restart
+    /etc/init.d/mysqld restart
     mysqladmin -uroot -p#{node[:mysql][:server_root_password]} password #{node[:mysql][:server_root_password]} && mysqladmin reload
     EOH
     not_if do

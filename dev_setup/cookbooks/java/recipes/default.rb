@@ -17,7 +17,9 @@ case node['platform']
 when "ubuntu"
 	
 when "centos"
-	package "java-1.5.0-gcj"
+  %w{java-1.6.0-openjdk java-1.6.0-openjdk-devel}.each do |pkg|
+    package pkg
+  end
 else
   Chef::Log.error("Installation of Sun Java packages not supported on this platform.")
 end

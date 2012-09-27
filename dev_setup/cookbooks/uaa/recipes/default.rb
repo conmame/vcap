@@ -8,7 +8,9 @@
 
 case node['platform']
 when "centos"
-  package "java-1.5.0-gcj"
+  %w{java-1.6.0-openjdk java-1.6.0-openjdk-devel}.each do |pkg|
+    package pkg
+  end
 end
 
 cf_pg_reset_user_password(:uaadb)
