@@ -63,11 +63,11 @@ when "ubuntu"
     group "root"
     mode "0600"
   end
-  
+
 when "centos"
     %w[
     pcre
-    pcre-dev
+    pcre-devel
     httpd
     apr
     apr-util
