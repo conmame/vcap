@@ -60,13 +60,8 @@ module CloudFoundryPostgres
 
       ruby_block "Update PostgreSQL config" do
         block do
-          # restart postgrsql
-          init_file = File.join("", "etc", "init.d", "postgresql")
-          backup_init_file = File.join("", "etc", "init.d", "postgresql")
-
           # update postgresql.conf
-          system("#{init_file} initdb")
-          postgresql_conf_file = File.join("", "var", "lib", "pgsql", "data", "postgresql.conf")
+          postgresql_conf_file = File.join("", "etc", "postgresql", pg_major_version, "main", "postgresql.conf")
           Chef::Log.error("Installation of PostgreSQL #{postgresql_pkg} failed, could not find config file #{postgresql_conf_file}") && (exit 1) unless File.exist?(postgresql_conf_file)
 
           `grep "^\s*listen_addresses" #{postgresql_conf_file}`
@@ -83,10 +78,14 @@ module CloudFoundryPostgres
             `sed -i.bkup -e "s/^\s*port\s*=\s*.*/port = #{pg_port}/" #{postgresql_conf_file}`
           end
 
+          # restart postgrsql
+          init_file = File.join("", "etc", "init.d", "postgresql-#{pg_major_version}")
+          backup_init_file = File.join("", "etc", "init.d", "postgresql")
+
           if File.exists?(init_file)
             Chef::Log.error("Fail to restart postgresql using #{init_file}") && (exit 1) unless system("#{init_file} restart")
           elsif File.exists?(backup_init_file)
-            Chef::Log.error("Fail to restart postgresql using #{backup_init_file}") && (exit 1) unless system("#{backup_init_file} restart")
+            Chef::Log.error("Fail to restart postgresql using #{backup_init_file}") && (exit 1) unless system("#{backup_init_file} restart #{pg_major_version}")
           else
             Chef::Log.error("Installation of PostgreSQL maybe failed, could not find init script")
             exit 1
