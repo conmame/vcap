@@ -16,7 +16,7 @@ module CloudFoundryPostgres
 
     binary = `ps -fp #{pid} | awk '{print $8}' | tail -n1`.strip
     return if binary == ""
-    
+
     case node['platform']
     when "ubuntu"
       version_check = `#{binary} --version | grep postgres | grep #{pg_major_version}`.strip
@@ -94,18 +94,33 @@ module CloudFoundryPostgres
       end
 
     when "centos"
-       %w[postgresql postgresql-server].each do |pkg|
-         package pkg
-       end
+      pg_init_name = "postgresql"
+      postgresql_conf_file = File.join("", "var", "lib", "pgsql", "data", "postgresql.conf")
+      case pg_major_version
+      when "8.4"
+        %w[postgresql postgresql-server].each do |pkg|
+          package pkg
+        end
+      when "9.0"
+        bash "Install postgresql #{pg_major_version}" do
+          code <<-EOH
+          sudo rpm -ivh http://yum.postgresql.org/9.0/redhat/rhel-6-x86_64/pgdg-centos90-9.0-5.noarch.rpm
+          sed -e "s/enabled=1/enabled=0/g" /etc/yum.repos.d/pgdg-90-centos.repo
+          sudo yum --enablerepo=pgdg90 install -y  postgresql90 postgresql90-server
+          EOH
+        end
+        pg_init_name = "postgresql-#{pg_major_version}"
+        postgresql_conf_file = File.join("", "var", "lib", "pgsql", pg_major_version , "data", "postgresql.conf")
+      end
 
        ruby_block "Update PostgreSQL config" do
         block do
-          init_file = File.join("", "etc", "init.d", "postgresql")
+          init_file = File.join("", "etc", "init.d", pg_init_name)
           backup_init_file = File.join("", "etc", "init.d", "postgresql")
 
           # update postgresql.conf
           system("#{init_file} initdb")
-          postgresql_conf_file = File.join("", "var", "lib", "pgsql", "data", "postgresql.conf")
+
           Chef::Log.error("Installation of PostgreSQL #{postgresql_pkg} failed, could not find config file #{postgresql_conf_file}") && (exit 1) unless File.exist?(postgresql_conf_file)
 
           `grep "^\s*listen_addresses" #{postgresql_conf_file}`
@@ -178,17 +193,23 @@ module CloudFoundryPostgres
       end
 
     when "centos"
+      pg_hba_conf_file = File.join("", "var", "lib", "pgsql", "data", "pg_hba.conf")
+      init_file = File.join("", "etc", "init.d", "postgresql")
+      case pg_major_version
+      when "9.0"
+        pg_hba_conf_file = File.join("", "var", "lib", "pgsql", pg_major_version , "data", "pg_hba.conf")
+        init_file = File.join("", "etc", "init.d", "postgresql-#{pg_major_version}")
+      end
+
       ruby_block "Update PostgreSQL config" do
         block do
           # Update pg_hba.conf
-          pg_hba_conf_file = File.join("", "var", "lib", "pgsql", "data", "pg_hba.conf")
           `grep "#{db}\s*#{user}" #{pg_hba_conf_file}`
           if $?.exitstatus != 0
             `echo "host #{db} #{user} 0.0.0.0/0 md5" >> #{pg_hba_conf_file}`
           end
 
           # restart postgrsql
-          init_file = "#{File.join("", "etc", "init.d", "postgresql")}"
           backup_init_file = "#{File.join("", "etc", "init.d", "postgresql")}"
 
           if File.exists?(init_file)
@@ -268,6 +289,14 @@ module CloudFoundryPostgres
       end
 
     when "centos"
+      pg_hba_conf_file = File.join("", "var", "lib", "pgsql", "data", "pg_hba.conf")
+      init_file = File.join("", "etc", "init.d", "postgresql")
+      case pg_major_version
+      when "9.0"
+        pg_hba_conf_file = File.join("", "var", "lib", "pgsql", pg_major_version ,"data", "pg_hba.conf")
+        init_file = File.join("", "etc", "init.d", "postgresql-#{pg_major_version}")
+      end
+
       ruby_block "Update PostgreSQL hba config to permit access without password in local node" do
         block do
           # Update pg_hba.conf
@@ -282,7 +311,6 @@ module CloudFoundryPostgres
           `echo "host    all             all             0.0.0.0/0               md5"   >> #{pg_hba_conf_file}`
 
           # restart postgrsql
-          init_file = "#{File.join("", "etc", "init.d", "postgresql")}"
           backup_init_file = "#{File.join("", "etc", "init.d", "postgresql")}"
 
           if File.exists?(init_file)
