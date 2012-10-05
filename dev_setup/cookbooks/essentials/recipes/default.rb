@@ -44,6 +44,12 @@ when "ubuntu"
   end
 
 when "centos"
+  bash "Install epel" do
+    code <<-EOH
+    sudo rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/i386/epel-release-6-7.noarch.rpm
+    EOH
+  end
+
   %w{openssl-devel
      libxml2 libxml2-devel libxslt libxslt-devel git-core sqlite ruby-sqlite3
      sqlite-devel unzip zip ruby-devel ruby-mysql mysql-devel libcurl-devel postgresql-libs}.each do |p|
