@@ -46,7 +46,7 @@ when "ubuntu"
 when "centos"
   bash "Install epel" do
     code <<-EOH
-    sudo rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/i386/epel-release-6-7.noarch.rpm
+    sudo rpm -ivh --force http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/i386/epel-release-6-7.noarch.rpm
     EOH
   end
 
