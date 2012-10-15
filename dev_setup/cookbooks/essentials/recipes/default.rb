@@ -52,7 +52,7 @@ when "centos"
 
   %w{openssl-devel
      libxml2 libxml2-devel libxslt libxslt-devel git-core sqlite ruby-sqlite3
-     sqlite-devel unzip zip ruby-devel ruby-mysql mysql-devel libcurl-devel postgresql-libs}.each do |p|
+     sqlite-devel unzip zip ruby-devel ruby-mysql mysql-devel libcurl-devel postgresql-libs postgresql-devel}.each do |p|
     package p do
       action [:install]
     end
