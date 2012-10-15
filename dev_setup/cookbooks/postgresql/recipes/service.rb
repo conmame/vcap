@@ -7,14 +7,10 @@
 #
 
 case node['platform']
-when "ubuntu"
+when "ubuntu","centos"
 
   /\s*\d*.\d*\s*/ =~ "#{node[:postgresql][:service_version]}"
   pg_major_version = $&.strip
-  
-
-when "centos"
-	
 else
     Chef::Log.error("Installation of PostgreSQL is not supported on this platform.")
 end
