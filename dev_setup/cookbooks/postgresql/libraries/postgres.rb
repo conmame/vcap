@@ -121,7 +121,7 @@ module CloudFoundryPostgres
           # update postgresql.conf
           system("#{init_file} initdb")
 
-          Chef::Log.error("Installation of PostgreSQL #{postgresql_pkg} failed, could not find config file #{postgresql_conf_file}") && (exit 1) unless File.exist?(postgresql_conf_file)
+          Chef::Log.error("Installation of PostgreSQL failed, could not find config file #{postgresql_conf_file}") && (exit 1) unless File.exist?(postgresql_conf_file)
 
           `grep "^\s*listen_addresses" #{postgresql_conf_file}`
           if $?.exitstatus != 0
