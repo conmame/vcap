@@ -161,12 +161,12 @@ module CloudFoundryPostgres
   end
 
   def cf_pg_update_hba_conf(db, user, pg_version)
+    /\s*\d*.\d*\s*/ =~  "#{pg_version}"
+    pg_major_version = $&.strip
     case node['platform']
     when "ubuntu"
       ruby_block "Update PostgreSQL config" do
         block do
-          /\s*\d*.\d*\s*/ =~  "#{pg_version}"
-          pg_major_version = $&.strip
 
           # Update pg_hba.conf
           pg_hba_conf_file = File.join("", "etc", "postgresql", pg_major_version, "main", "pg_hba.conf")
@@ -253,12 +253,12 @@ module CloudFoundryPostgres
   end
 
   def cf_pg_hba_local_trust(pg_version)
+    /\s*\d*.\d*\s*/ =~  "#{pg_version}"
+    pg_major_version = $&.strip
     case node['platform']
     when "ubuntu"
       ruby_block "Update PostgreSQL hba config to permit access without password in local node" do
         block do
-          /\s*\d*.\d*\s*/ =~  "#{pg_version}"
-          pg_major_version = $&.strip
 
           # Update pg_hba.conf
           pg_hba_conf_file = File.join("", "etc", "postgresql", pg_major_version, "main", "pg_hba.conf")
