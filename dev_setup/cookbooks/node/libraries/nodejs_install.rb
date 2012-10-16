@@ -25,7 +25,7 @@ module NodeInstall
     build_option = ""
     case node['platform']
     when "centos"
-      build_option = "CFLAGS+=-O2 CXXFLAGS+=-O2" if node_version = "0.8.2"
+      build_option = "CFLAGS+=-O2 CXXFLAGS+=-O2" if node_version == "0.8.2"
     end
 
     bash "Install Node.js version " + node_version do
