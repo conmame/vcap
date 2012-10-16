@@ -303,7 +303,6 @@ module CloudFoundryPostgres
       ruby_block "Update PostgreSQL hba config to permit access without password in local node" do
         block do
           # Update pg_hba.conf
-          pg_hba_conf_file = File.join("", "var", "lib", "pgsql", "data", "pg_hba.conf")
           `sed -i /local[[:space:]]*all[[:space:]]*all/d #{pg_hba_conf_file}`
           `sed -i /host[[:space:]]*all[[:space:]]*all[[:space:]]*127\.0\.0\.1/d #{pg_hba_conf_file}`
           `sed -i /host[[:space:]]*all[[:space:]]*all[[:space:]]*::1/d #{pg_hba_conf_file}`
