@@ -11,6 +11,8 @@ when "ubuntu","centos"
 
   /\s*\d*.\d*\s*/ =~ "#{node[:postgresql][:service_version]}"
   pg_major_version = $&.strip
+  pg_port = "#{node[:postgresql][:service_port]}"
+  cf_pg_install(pg_major_version, pg_port)
 else
     Chef::Log.error("Installation of PostgreSQL is not supported on this platform.")
 end
