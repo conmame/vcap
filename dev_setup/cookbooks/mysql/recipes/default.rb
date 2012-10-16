@@ -52,7 +52,9 @@ when "centos"
   end
 
   bash "Set mysql root password" do
+    user "root"
     code <<-EOH
+    chkconfig mysqld on
     /etc/init.d/mysqld restart
     mysqladmin -uroot password #{node[:mysql][:server_root_password]} && mysqladmin -uroot -p#{node[:mysql][:server_root_password]} reload
     exit 0
