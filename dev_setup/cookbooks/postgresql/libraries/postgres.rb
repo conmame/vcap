@@ -107,7 +107,7 @@ module CloudFoundryPostgres
           sudo rpm -ivh http://yum.postgresql.org/9.0/redhat/rhel-6-x86_64/pgdg-centos90-9.0-5.noarch.rpm
           sed -e "s/enabled=1/enabled=0/g" /etc/yum.repos.d/pgdg-90-centos.repo
           sudo yum --enablerepo=pgdg90 install -y  postgresql90 postgresql90-server
-          sed -i -e "s/^PGPORT=5422/PGPORT=#{pg_port}/" /etc/init.d/postgresql-9.0
+          sed -i -e "s/^PGPORT=5432/PGPORT=#{pg_port}/" /etc/init.d/postgresql-9.0
           EOH
         end
         pg_init_name = "postgresql-#{pg_major_version}"
